@@ -81,6 +81,26 @@ export const handler = async (event) => {
         return sendJson(200, doc)
       }
 
+      if (body.action === "newstudy") {
+        const updated = await collection.findOneAndUpdate(
+          {_id: STATE_ID},
+          { $set: {
+            policy: body.policy,
+            condition: body.condition,
+            participants: body.participants,
+            arrived: body.arrived,
+            arrivedIDs: body.arrivedIDs,
+            inDemographic: body.inDemographic,
+            inConversation: body.inConversation,
+            id: body.id
+          }},
+          {returnDocument: "after"}
+        );
+        const doc = updated?.value ?? updated;
+        if (!doc) return sendJson(404, {error: "State object not found"});
+        return sendJson(200, doc);
+      }
+
       return sendJson(400, { error: "Unknown action." });
     }
 
