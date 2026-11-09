@@ -1,122 +1,85 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
+import {useState, useEffect} from "react"
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [pushCounter, setPushCounter] = useState(0)
+  const [pullCounter, setPullCounter] = useState(0);
+  const [active, setActive] = useState(false);
+  const [activeButtonText, setActiveButtonText] = useState("Push");
+
+  const pushStatus = pushCounter > 0 ? "Pushing" : "Dormant";
+  const pullStatus = pullCounter > 0 ? "Pulling" : "Dormant";
+
+  const update_push_counter = (input) => {
+    setPushCounter(prev => prev + input);
+  }
+
+  const update_pull_counter = (input) => {
+    setPullCounter(prev => prev + Number(input));
+  }
+
+  const pull_state = async () => {
+    update_pull_counter(1);
+    try {
+      const res = await fetch("/.netlify/functions/state", {
+        method: "GET"
+      });
+      if (!res.ok) {
+        throw new Error(`Request failes: ${res.status}`);
+      }
+      const data = await res.json();
+      setActive(data.active);
+    }
+    catch (err) {
+      console.log(err);
+    }
+    update_pull_counter(-1);
+  }
+
+  useEffect(() => {
+    pull_state();
+
+    const intervalId = setInterval(() => {
+      pull_state();
+    }, 3000);
+
+    return () => clearInterval(intervalId);
+  }, []);
+
+  
+
+  const push_active = async () => {
+    console.log(active);
+    setActiveButtonText("Loading")
+    update_push_counter(1);
+    try {
+      const res = await fetch("/.netlify/functions/state", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: "active", active }),
+      });
+      if (!res.ok) {
+          throw new Error(`Request failed: ${res.status}`);
+      }
+    }
+    catch (err) {
+        console.log(err);
+    }
+    setActiveButtonText("Submit")
+    update_push_counter(-1);
+  }
+
 
   return (
     <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
+      <h2>Push: {pushStatus}</h2>
+      <h2>Pull: {pullStatus}</h2>
+      <div className="active-box-container">
+        <h3>Active:</h3>
+        <input className="input-short" type="checkbox" checked={active} onChange={e => setActive(e.target.checked)}></input>
+        <button className="button" onClick={() => push_active()}>{activeButtonText}</button>
+      </div>
     </>
   )
 }
 
-export default App
+export default App;
