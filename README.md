@@ -10,12 +10,12 @@ To run:
 6. netlify dev
 
 
-##Functionality:
+## Functionality:
 
 Database pulls: The website automatically refreshes from the database every 3 seconds. This is seen in the brief changes on the 
 "Pull Status" from "Dormant" to "Pulling" every few seconds.
 
-###Visual Information:
+### Visual Information:
 1. The top right box contains live view of database actions. Whenever a function anywhere in the dashboard pushes or pulls from the database, this box reflects that.
 2. The bottom right box contains live view of the state document. Note that no other elements on the page interact with this information; the statuses shown in this box are a direct reflection of what's in the DB. This means that you can verify whatever action you're doing by checking it against this document, since it reflects the actual DB 1:1.
 3. The main visual component of the screen is the user timeline. This shows which usernames (that fall within this specific round of the study) have completed/are in which section. Note that usernames don't get deleted from previous sections, so if a user is shown to be "In Primes" and "In waiting" there's not two users with the same name; the user has simply completed primes and moved on to the waiting room.
@@ -26,7 +26,7 @@ Database pulls: The website automatically refreshes from the database every 3 se
 
 Each of these is updated every time the state is updated (every 3s)
 
-###Inputs:
+### Inputs:
 1. The top left component has a "Create New Study" button. This automates the process of changing the state values, creating the new conversation document, linking it with ID, etc. Note that clicking "submit" after setting the study up will directly modify the state document and "clear" the previous study. Under the hood:
     - Creates a new conversation document with the given policy and condition and retrieves the _id of that document
     - Patch the state document with the new policy, condition, participants, and send to demographic specification, as well as _id of newly created conversation document
