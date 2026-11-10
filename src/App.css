@@ -1,0 +1,118 @@
+.page-columns {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+
+.page-columns {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+  width: 100%;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.row-centered {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.hot-state-changes {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  background-color: var(--surface);
+  margin: 10px 10px;
+  padding: 20px;
+  border-radius: 20px;
+}
+
+.hot-state-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+.hot-state-container h4 {
+  margin: 0;
+}
+
+.input-short {
+  width: 50px;
+}
+
+.checkbox {
+  width: 20px;
+  height: 20px;
+}
+
+.button {
+  background-color: var(--accent);
+  color: whitesmoke;
+  padding: 5px 8px;;
+  border-radius: 10px;
+  font-size: 1rem;
+  border: 0px;
+  cursor: pointer;
+}
+
+.state-monitor-container {
+  background-color: var(--surface);
+  margin: 10px 20px;
+  padding: 20px;
+  border-radius: 20px;
+}
+
+.push-log {
+  background-color: var(--surface);
+  margin: 10px 20px;
+  padding: 20px;
+  border-radius: 20px;
+}
+
+.new-study-container {
+  background-color: var(--surface);
+  margin: 10px 20px;
+  padding: 20px;
+  border-radius: 20px;
+}
+
+.create-study-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+}
+
+.study-pipeline-monitor {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.study-pipeline-element {
+  background-color: var(--surface);
+  padding: 15px;
+  border-radius: 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 300px;
+}
+
+.study-pipeline-element p {
+  margin-top: 2px;
+  margin-bottom: 2px;
+}
+

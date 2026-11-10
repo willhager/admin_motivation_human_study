@@ -81,6 +81,35 @@ export const handler = async (event) => {
         return sendJson(200, doc)
       }
 
+      if (body.action === "participants") {
+        const {participants} = body;
+
+        const updated = await collection.findOneAndUpdate(
+          {_id: STATE_ID},
+          { $set: {participants} },
+          {returnDocument: "after"}
+        );
+        const doc = updated?.value ?? updated;
+        if (!doc) return sendJson(404, {error: "State object not found"});
+        return sendJson(200, doc)
+      }
+
+      if (body.action === "indemographic") {
+        const {inDemographic} = body;
+        if (typeof inDemographic !== "boolean") {
+          return sendJson(400, { error: "active (boolean) is required."});
+        }
+
+        const updated = await collection.findOneAndUpdate(
+          {_id: STATE_ID},
+          { $set: {inDemographic} },
+          {returnDocument: "after"}
+        );
+        const doc = updated?.value ?? updated;
+        if (!doc) return sendJson(404, {error: "State object not found"});
+        return sendJson(200, doc)
+      }
+
       if (body.action === "newstudy") {
         const updated = await collection.findOneAndUpdate(
           {_id: STATE_ID},
