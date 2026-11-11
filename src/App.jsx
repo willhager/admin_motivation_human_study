@@ -153,8 +153,9 @@ function App() {
   }
 
   const pull_primes = async (stateData) => {
+    let studyID = stateData.id;
     try {
-        const res = await fetch(`/.netlify/functions/primes`, {
+        const res = await fetch(`/.netlify/functions/primes?id=${studyID}`, {
             method: "GET",
         });
         if (!res.ok) {
@@ -162,7 +163,7 @@ function App() {
         }
         const data = await res.json();
         const usernames = data
-            .filter(entry => entry.studyID = stateData.id && entry.opinionStrength != null)
+            .filter(entry => entry.opinionStrength != null)
             .map(entry => entry.uID);        
         setPassedPrimes(usernames);
     }
@@ -172,9 +173,9 @@ function App() {
   }
 
   const pull_conversation = async (stateData) => {
-    let id = stateData.id;
+    let studyID = stateData.id;
     try {
-        const res = await fetch(`/.netlify/functions/conversations?id=${id}`, {
+        const res = await fetch(`/.netlify/functions/conversations?id=${studyID}`, {
             method: "GET",
         });
         if (!res.ok) {
@@ -190,8 +191,9 @@ function App() {
   }
 
   const pull_post_survey = async (stateData) => {
+    let studyID = stateData.id;
     try {
-        const res = await fetch(`/.netlify/functions/post_survey`, {
+        const res = await fetch(`/.netlify/functions/post_survey?id=${studyID}`, {
             method: "GET",
         });
         if (!res.ok) {
@@ -199,7 +201,7 @@ function App() {
         }
         const data = await res.json();
         const usernames = data
-            .filter(entry => entry.studyID = stateData.id && entry.believabilityScore != null)
+            .filter(entry => entry.believabilityScore != null)
             .map(entry => entry.uID);
         setFinishedPostSurvey(usernames);
     }

@@ -16,8 +16,15 @@ export const handler = async (event) => {
     try {
 
         if(method === "GET") {
-            const items = await collection().find({}).toArray();
-            return sendJson(200, items);
+             if (event.queryStringParameters?.id) {
+                const id = event.queryStringParameters?.id;
+                const item = await collection().find({studyID: id}).toArray();
+                return sendJson(200, item);
+            }
+            else {
+                const items = await collection().find({}).toArray();
+                return sendJson(200, items);
+            }
         }
         
         if(method === "POST"){
