@@ -21,7 +21,7 @@ Database pulls: The website automatically refreshes from the database every 3 se
 3. The main visual component of the screen is the user timeline. This shows which usernames (that fall within this specific round of the study) have completed/are in which section. Note that usernames don't get deleted from previous sections, so if a user is shown to be "In Primes" and "In waiting" there's not two users with the same name; the user has simply completed primes and moved on to the waiting room.
     - In Primes: The user has passed the pre-survey and is/should be engaging with the primes. This is measured by having a full submission from pre-survey
     - In Waiting Room: The user has finished the primes and is waiting for others to arrive (or for the participants value in state to drop to the number of arrived users). This is measured from having a completed primes submission (moved through the written and also the AI opinion importance likert)
-    - Sent Message in Conversation: Self explanatory.
+    - Sent Message in Conversation: Self explanatory. The "See Conversation" button opens up a pop-up window that displays the live conversation as users are seeing it, from a read-only perspective.
     - Finished post-survey: The user has made it to the final debrief page. This is measured by having a full post-survey submission.
 
 Each of these is updated every time the state is updated (every 3s)
@@ -35,5 +35,5 @@ Each of these is updated every time the state is updated (every 3s)
     - active: this determines whether or not users can enter any component of the study. If this is false, users are kept in the initial waiting room indefinitely
     - inDemographic: this determines whether users are sent to the demographic collection component of the study or the study itself
     - participants: the number of participants the server expects to see. this determines at what point users in the conversation waiting room get moved into the conversation.
-
+3. Along the top of the screen is a row of buttons, each corresponding to one of the databases in the Mongo. The highlighted button (the blue one) is the database that's currently being looked at, and clicking one of the other buttons sets the current database to the text displayed on that button. Clicking between these has no effect on the database itself, and merely changes which one is being displayed at the current moment. To add a new database to the list, locate the array "databases" in the file src/App.jsx and add the new database name to the array. Be sure that database has been correctly instantiated in the Mongo and that the name is copied exactly (case sensitive).
 

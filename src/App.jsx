@@ -1,11 +1,16 @@
 import {useState, useEffect} from "react"
 import "./App.css";
+import ConversationPopup from "./ConversationPopup";
 
 function App() {
   const [pushCounter, setPushCounter] = useState(0)
   const [pullCounter, setPullCounter] = useState(0);
 
   const [state, setState] = useState(null);
+
+  const [DBName, setDBName] = useState("internaltesting");
+
+  const databases = ["internaltesting", "human_study_website"];
 
   const [active, setActive] = useState(false);
   const [activeButtonText, setActiveButtonText] = useState("Submit");
@@ -31,8 +36,13 @@ function App() {
 
   const [userNameMap, setUserNameMap] = useState({})
 
+  const [conversationOpen, setConversationOpen] = useState(false);
+
+  const [conversation, setConversation] = useState([]);
+
   const pushStatus = pushCounter > 0 ? "Pushing" : "Dormant";
   const pullStatus = pullCounter > 0 ? "Pulling" : "Dormant";
+
 
   const update_push_counter = (input) => {
     setPushCounter(prev => prev + input);
@@ -45,7 +55,7 @@ function App() {
   const pull_state = async () => {
     update_pull_counter(1);
     try {
-      const res = await fetch("/.netlify/functions/state", {
+      const res = await fetch(`/.netlify/functions/state?db=${DBName}`, {
         method: "GET"
       });
       if (!res.ok) {
@@ -72,7 +82,7 @@ function App() {
     setActiveButtonText("Loading");
     update_push_counter(1);
     try {
-      const res = await fetch("/.netlify/functions/state", {
+      const res = await fetch(`/.netlify/functions/state?db=${DBName}`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ action: "active", active }),
@@ -92,7 +102,7 @@ function App() {
     setInDemographicButtonText("Loading");
     update_push_counter(1);
     try {
-      const res = await fetch("/.netlify/functions/state", {
+      const res = await fetch(`/.netlify/functions/state?db=${DBName}`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ action: "indemographic", inDemographic }),
@@ -112,7 +122,7 @@ function App() {
     setParticipantsButtonText("Loading");
     update_push_counter(1);
     try {
-      const res = await fetch("/.netlify/functions/state", {
+      const res = await fetch(`/.netlify/functions/state?db=${DBName}`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ action: "participants", participants }),
@@ -131,7 +141,7 @@ function App() {
   const pull_pre_survey = async (stateData) => {
     let studyID = stateData.id;
     try {
-        const res = await fetch(`/.netlify/functions/pre_survey?id=${studyID}`, {
+        const res = await fetch(`/.netlify/functions/pre_survey?id=${studyID}&db=${DBName}`, {
             method: "GET",
         });
         if (!res.ok) {
@@ -155,7 +165,7 @@ function App() {
   const pull_primes = async (stateData) => {
     let studyID = stateData.id;
     try {
-        const res = await fetch(`/.netlify/functions/primes?id=${studyID}`, {
+        const res = await fetch(`/.netlify/functions/primes?id=${studyID}&db=${DBName}`, {
             method: "GET",
         });
         if (!res.ok) {
@@ -175,13 +185,17 @@ function App() {
   const pull_conversation = async (stateData) => {
     let studyID = stateData.id;
     try {
-        const res = await fetch(`/.netlify/functions/conversations?id=${studyID}`, {
+        const res = await fetch(`/.netlify/functions/conversations?id=${studyID}&db=${DBName}`, {
             method: "GET",
         });
         if (!res.ok) {
             throw new Error("Something went wrong saving your information. Please try again.");
         }
         const data = await res.json();
+        const sorted = [...data.conversation].sort(
+                (a, b) => new Date(a.timestamp) - new Date(b.timestamp)
+            );
+        setConversation(sorted);
         const usernames = [...new Set(data.conversation.map(entry => entry.uID))];
         setSentMessageInConversation(usernames);
     }
@@ -193,7 +207,7 @@ function App() {
   const pull_post_survey = async (stateData) => {
     let studyID = stateData.id;
     try {
-        const res = await fetch(`/.netlify/functions/post_survey?id=${studyID}`, {
+        const res = await fetch(`/.netlify/functions/post_survey?id=${studyID}&db=${DBName}`, {
             method: "GET",
         });
         if (!res.ok) {
@@ -214,7 +228,7 @@ function App() {
   const create_new_conversation = async () => {
     update_push_counter(1);
     try {
-        const res = await fetch("/.netlify/functions/conversations", {
+        const res = await fetch(`/.netlify/functions/conversations?db=${DBName}`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -245,7 +259,7 @@ function App() {
     let conversationID = await create_new_conversation();
     update_push_counter(1);
     try {
-        const res = await fetch("/.netlify/functions/state", {
+        const res = await fetch(`/.netlify/functions/state?db=${DBName}`, {
             method: "PATCH",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ 
@@ -286,9 +300,23 @@ function App() {
     }, 3000);
 
     return () => clearInterval(intervalId);
-  }, []);
+  }, [DBName]);
 
   return (
+    <>
+
+    <div className="row-centered-space-around">
+      {databases.map((value, index) => {
+        let selected = "";
+        if (DBName===value){
+          selected = "selected";
+        }
+        return (
+          <button key={index} className={`button ${selected}`} onClick={() => setDBName(value)}>{value}</button>
+        )
+      })}
+    </div>
+
     <div className="page-columns">
 
       <div className="page-column">
@@ -346,6 +374,7 @@ function App() {
           </div>
           <div className="study-pipeline-element">
             <h3>Sent Message in Conversation:</h3>
+            <button className="button" onClick={() => setConversationOpen(true)}>See Conversation</button>
             {sentMessageInConversation && sentMessageInConversation.map((item) => <p key={item}>{userNameMap[item]}</p>)}
           </div>
           <div className="study-pipeline-element">
@@ -390,7 +419,11 @@ function App() {
           <p>id: {state.id}</p>
         </div>}
       </div>
+
+      {conversationOpen && <ConversationPopup conversation={conversation} onClose={() => setConversationOpen(false)}></ConversationPopup>}
+
     </div>
+    </>
   )
 }
 

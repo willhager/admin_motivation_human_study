@@ -7,17 +7,16 @@ const sendJson = (statusCode, body) => ({
   body: JSON.stringify(body),
 });
 
-const STATE_ID = new ObjectId("6ad678f761b961446f4150af");
-
 export const handler = async (event) => {
   const method = event.httpMethod;
+  const db_name = event.queryStringParameters?.db ?? "internaltesting";
 
   try {
     const client = await getClientPromise();
-    const collection = client.db("human_study_website").collection("state");
+    const collection = client.db(db_name).collection("state");
 
     if (method === "GET") {
-      const state = await collection.findOne({ _id: STATE_ID });
+      const state = await collection.findOne({});
       if (!state) return sendJson(404, { error: "State object not found." });
       return sendJson(200, state);
     }
@@ -37,7 +36,7 @@ export const handler = async (event) => {
         }
 
         const updated = await collection.findOneAndUpdate(
-          { _id: STATE_ID },
+          {},
           [
             { $set: { arrivedIDs: { $setUnion: [{ $ifNull: ["$arrivedIDs", []] }, [uID]] } } },
             { $set: { arrived: { $size: "$arrivedIDs" } } },
@@ -56,7 +55,7 @@ export const handler = async (event) => {
         }
 
         const updated = await collection.findOneAndUpdate(
-          { _id: STATE_ID },
+          {},
           { $set: { inConversation } },
           { returnDocument: "after" }
         );
@@ -72,7 +71,7 @@ export const handler = async (event) => {
         }
 
         const updated = await collection.findOneAndUpdate(
-          {_id: STATE_ID},
+          {},
           { $set: {active} },
           {returnDocument: "after"}
         );
@@ -85,7 +84,7 @@ export const handler = async (event) => {
         const {participants} = body;
 
         const updated = await collection.findOneAndUpdate(
-          {_id: STATE_ID},
+          {},
           { $set: {participants} },
           {returnDocument: "after"}
         );
@@ -101,7 +100,7 @@ export const handler = async (event) => {
         }
 
         const updated = await collection.findOneAndUpdate(
-          {_id: STATE_ID},
+          {},
           { $set: {inDemographic} },
           {returnDocument: "after"}
         );
@@ -112,7 +111,7 @@ export const handler = async (event) => {
 
       if (body.action === "newstudy") {
         const updated = await collection.findOneAndUpdate(
-          {_id: STATE_ID},
+          {},
           { $set: {
             policy: body.policy,
             condition: body.condition,

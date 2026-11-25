@@ -11,7 +11,8 @@ const sendJson = (statusCode, body) => ({
 export const handler = async (event) => {
     const method = event.httpMethod;
     const client = await getClientPromise();
-    const collection = () => client.db("human_study_website").collection("post_survey")
+    const db_name = event.queryStringParameters.db ?? {};
+    const collection = () => client.db(db_name).collection("post_survey")
 
     try {
 
